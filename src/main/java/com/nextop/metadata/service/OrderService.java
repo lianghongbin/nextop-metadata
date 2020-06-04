@@ -1,4 +1,4 @@
-package com.nextop.metadata.order.service;
+package com.nextop.metadata.service;
 
 import com.nextop.metadata.entity.Order;
 

@@ -1,4 +1,4 @@
-package com.nextop.metadata.order.mapper;
+package com.nextop.metadata.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.nextop.metadata.entity.Order;

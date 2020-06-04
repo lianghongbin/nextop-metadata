@@ -1,7 +1,8 @@
-package com.nextop.metadata.order.service;
+package com.nextop.metadata.service;
 
 import com.nextop.metadata.entity.Order;
-import com.nextop.metadata.order.mapper.OrderMapper;
+import com.nextop.metadata.mapper.OrderMapper;
+import com.nextop.metadata.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -16,11 +17,11 @@ import javax.annotation.Resource;
 public class OrderServiceImpl implements OrderService {
 
     @Resource
-    private OrderMapper orderMapper;
+    private OrderRepository orderRepository;
 
 
     @Override
     public Order find(Long id) {
-        return orderMapper.selectById(id);
+        return orderRepository.findById(id);
     }
 }

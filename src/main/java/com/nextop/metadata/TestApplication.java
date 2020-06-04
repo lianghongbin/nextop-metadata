@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.nextop.metadata.*.mapper")
+@MapperScan("com.nextop.metadata.mapper")
 public class TestApplication {
   public static void main(String[] args) {
 

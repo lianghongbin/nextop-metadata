@@ -1,8 +1,7 @@
-package com.nextop.metadata.order.controller;
+package com.nextop.metadata.controller;
 
 import com.nextop.metadata.entity.Order;
-import com.nextop.metadata.order.service.OrderService;
-import org.apache.ibatis.annotations.Param;
+import com.nextop.metadata.service.OrderService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;

@@ -2,6 +2,8 @@ package com.nextop.metadata.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import java.io.Serializable;
+
 /**
  * Description:
  *
@@ -10,7 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
  * @update:
  */
 @TableName("nextop_order")
-public class Order {
+public class Order implements Serializable {
 
     private Long id;
     private String name;
