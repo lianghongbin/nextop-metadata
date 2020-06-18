@@ -1,12 +1,26 @@
 package com.nextop.metadata;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.nextop.metadata.annonation.Classifier;
+import com.nextop.metadata.annonation.Column;
+import com.nextop.metadata.entity.Classification;
+import com.nextop.metadata.entity.Field;
+import com.nextop.metadata.repository.ClassificationRepository;
+import com.nextop.metadata.repository.FieldRepository;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+import javax.xml.crypto.Data;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * Description:
@@ -19,30 +33,117 @@ import java.lang.reflect.ParameterizedType;
 @Component
 public class RepositoryAspect {
 
+    private IdWorker idWorker = new IdWorker();
+    @Resource
+    private ClassificationRepository classificationRepository;
+    @Resource
+    private FieldRepository fieldRepository;
+
     @Pointcut("execution(public * com.nextop.metadata.repository.*.*(..))")
     public void point() {
     }
 
-    @Before(value = "point()")
-    public void doBefore(JoinPoint joinPoint) throws ClassNotFoundException { System.out.println("目标方法名为:" + joinPoint.getSignature().getName());
-        System.out.println("目标方法所属类的简单类名:" +        joinPoint.getSignature().getDeclaringType().getSimpleName());
-        System.out.println("目标方法所属类的类名:" + joinPoint.getSignature().getDeclaringTypeName());
-        //Class<?> clazz = (Class<?>) ((ParameterizedType)joinPoint.getSignature().getDeclaringType().getGenericInterfaces()[0]).getActualTypeArguments()[0];
-        //boolean isMetadata = AnnotationParser.isMetadata(clazz);
-
-
-        System.out.println("目标方法声明类型:" + Modifier.toString(joinPoint.getSignature().getModifiers()));
-        //获取传入目标方法的参数
-        Object[] args = joinPoint.getArgs();
-        for (int i = 0; i < args.length; i++) {
-            System.out.println("第" + (i+1) + "个参数为:" + args[i]);
-        }
-        System.out.println("被代理的对象:" + joinPoint.getTarget());
-        System.out.println("代理对象自己:" + joinPoint.getThis());
-        System.out.println("do before!");
+    @Pointcut("execution(* com.nextop.metadata.repository..*.select*(..)) " +
+            "|| execution(* com.nextop.metadata.repository..*.find*(..)))" +
+            "|| execution(* com.nextop.metadata.repository..*.list*(..)))" +
+            "|| execution(* com.nextop.metadata.repository..*.get*(..)))" +
+            "|| execution(* com.nextop.metadata.repository..*.fetch*(..)))")
+    public void read() {
     }
 
-    @After(value = "point()")
+    @Pointcut("execution(* com.nextop.metadata.repository..*.insert*(..)) " +
+            "|| execution(* com.nextop.metadata.repository..*.save*(..)))" +
+            "|| execution(* com.nextop.metadata.repository..*.add*(..)))" +
+            "|| execution(* com.nextop.metadata.repository..*.put*(..)))")
+    public void create() {
+    }
+
+    @Pointcut("execution(* com.nextop.metadata.repository..*.update*(..)) " +
+            "|| execution(* com.nextop.metadata.repository..*.modify*(..)))")
+    public void update() {
+    }
+
+    @Pointcut("execution(* com.nextop.metadata.repository..*.delete*(..)) " +
+            "|| execution(* com.nextop.metadata.repository..*.remove*(..)))")
+    public void delete() {
+    }
+
+    @Before(value = "create()")
+    public void doBefore(JoinPoint joinPoint) throws ClassNotFoundException {
+        System.out.println("目标方法名为:" + joinPoint.getSignature().getName());
+        System.out.println("目标方法所属类的简单类名:" + joinPoint.getSignature().getDeclaringType().getSimpleName());
+        System.out.println("目标方法所属类的类名:" + joinPoint.getSignature().getDeclaringTypeName());
+
+        System.out.println(joinPoint.getSignature().getDeclaringType().getInterfaces()[0].getGenericInterfaces()[0]);
+        Type type;
+        try {
+            type = joinPoint.getSignature().getDeclaringType().getInterfaces()[0].getGenericInterfaces()[0];
+            if (!(type instanceof ParameterizedType)) {
+                return;
+            }
+        } catch (Exception exception) {
+            return;
+        }
+
+        Class<?> clazz = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
+        if(!AnnotationParser.isMetadata(clazz)) {
+            return;
+        }
+
+        //获取参数实例
+        Object[] args = joinPoint.getArgs();
+        if (args.length > 1) {
+            return;
+        }
+
+        Object object = args[0];
+        if(!AnnotationParser.isMetadata(object.getClass())) {
+            return;
+        }
+
+        TableName tableName = object.getClass().getAnnotation(TableName.class);
+        String name = "".equals(tableName.value()) ? object.getClass().getName() : tableName.value();
+
+        //获取classification
+        Classifier classifier = object.getClass().getAnnotation(Classifier.class);
+        name = "".equals(classifier.name()) ? name : classifier.name();
+
+        Classification classification = new Classification();
+        classification.setName(name);
+        classification.setComment(name);
+        classification.setCreateTime(Calendar.getInstance().getTimeInMillis());
+        Long id =idWorker.nextId();
+        classification.setId(id);
+
+        classificationRepository.save(classification);
+
+        List<Field> fieldList = new ArrayList<>();
+
+        java.lang.reflect.Field[] fields = object.getClass().getDeclaredFields();
+        for (java.lang.reflect.Field field : fields ) {
+            field.setAccessible(true);
+            Column columnAnnotation = field.getAnnotation(Column.class); //获取指定类型注解
+            if (columnAnnotation == null) {
+                continue;
+            }
+
+            try {
+
+                List<Field> columnList =  (List<Field>)field.get(object);
+                fieldList.addAll(columnList);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        fieldList.forEach(item -> {
+            item.setClassId(id);
+        });
+
+        fieldRepository.saveBatch(fieldList);
+    }
+
+    @After(value = "read()")
     public void doAfter(JoinPoint joinPoint) {
         System.out.println("do after!");
     }

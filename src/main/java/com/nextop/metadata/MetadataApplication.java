@@ -6,9 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @MapperScan("com.nextop.metadata.mapper")
-public class TestApplication {
+public class MetadataApplication {
   public static void main(String[] args) {
 
-    SpringApplication.run(TestApplication.class, args);
+    SpringApplication.run(MetadataApplication.class, args);
   }
 }

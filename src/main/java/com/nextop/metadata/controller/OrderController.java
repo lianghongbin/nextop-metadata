@@ -2,10 +2,7 @@ package com.nextop.metadata.controller;
 
 import com.nextop.metadata.entity.Order;
 import com.nextop.metadata.service.OrderService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -26,5 +23,10 @@ public class OrderController {
     public Order find(@RequestParam() Long id) {
 
         return orderService.find(id);
+    }
+
+    @PostMapping("")
+    public int save(@RequestBody Order order) {
+        return orderService.save(order);
     }
 }

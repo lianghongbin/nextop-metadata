@@ -22,7 +22,7 @@ public class DefaultOrderRepository implements OrderRepository {
 
     @Override
     public int save(Order order) {
-        return 0;
+        return orderMapper.insert(order);
     }
 
     @Override

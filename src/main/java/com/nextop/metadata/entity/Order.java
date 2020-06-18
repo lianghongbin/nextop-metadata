@@ -1,8 +1,12 @@
 package com.nextop.metadata.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.nextop.metadata.annonation.Classifier;
+import com.nextop.metadata.annonation.Column;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Description:
@@ -12,10 +16,14 @@ import java.io.Serializable;
  * @update:
  */
 @TableName("nextop_order")
+@Classifier
 public class Order implements Serializable {
 
     private Long id;
     private String name;
+    @Column
+    @TableField(exist = false)
+    private List<Field> fields;
 
     public Long getId() {
         return id;
@@ -31,5 +39,13 @@ public class Order implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Field> getFields() {
+        return fields;
+    }
+
+    public void setFields(List<Field> fields) {
+        this.fields = fields;
     }
 }

@@ -1,7 +1,7 @@
 package com.nextop.metadata.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.nextop.metadata.entity.Order;
+import com.nextop.metadata.entity.Field;
 
 /**
  * 租户信息 Mapper 接口
@@ -9,5 +9,5 @@ import com.nextop.metadata.entity.Order;
  * @author majiangping
  * @since 2020-04-09
  */
-public interface ColumnMapper extends BaseMapper<Order> {
+public interface FieldMapper extends BaseMapper<Field> {
 }

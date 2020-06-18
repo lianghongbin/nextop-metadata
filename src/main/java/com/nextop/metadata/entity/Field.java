@@ -1,5 +1,7 @@
 package com.nextop.metadata.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
+
 import java.io.Serializable;
 
 /**
@@ -9,13 +11,13 @@ import java.io.Serializable;
  * @date: 6/1/20
  * @update:
  */
+@TableName("nextop_field")
 public class Field implements Serializable {
 
     private Long id;
     private Long classId;
     private String name;
     private String type;
-    private boolean empty;
     private String comment;
     private Long createTime;
     private Long updateTime;
@@ -50,14 +52,6 @@ public class Field implements Serializable {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public boolean isEmpty() {
-        return empty;
-    }
-
-    public void setEmpty(boolean empty) {
-        this.empty = empty;
     }
 
     public String getComment() {

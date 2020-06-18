@@ -1,6 +1,7 @@
 package com.nextop.metadata.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.nextop.metadata.entity.Classification;
 import com.nextop.metadata.entity.Order;
 
 /**
@@ -9,5 +10,5 @@ import com.nextop.metadata.entity.Order;
  * @author majiangping
  * @since 2020-04-09
  */
-public interface ClassificationMapper extends BaseMapper<Order> {
+public interface ClassificationMapper extends BaseMapper<Classification> {
 }

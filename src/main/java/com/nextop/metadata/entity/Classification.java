@@ -1,5 +1,10 @@
 package com.nextop.metadata.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
 import java.io.Serializable;
 
 /**
@@ -9,8 +14,10 @@ import java.io.Serializable;
  * @date: 6/1/20
  * @update:
  */
+@TableName("nextop_classification")
 public class Classification implements Serializable {
 
+    @TableId(value = "id",type = IdType.INPUT)
     private Long id;
     private String name;
     private String comment;

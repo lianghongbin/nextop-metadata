@@ -12,4 +12,6 @@ import com.nextop.metadata.entity.Order;
 public interface OrderService {
 
     Order find(Long id);
+
+    int save(Order order);
 }
