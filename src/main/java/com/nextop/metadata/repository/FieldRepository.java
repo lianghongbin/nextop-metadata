@@ -15,4 +15,11 @@ import java.util.List;
 public interface FieldRepository extends Repository<Field> {
 
     int saveBatch(List<Field> fields);
+
+    /**
+     * 根据类ID，取出所有类属性
+     * @param id 类ID
+     * @return 属性列表
+     */
+    List<Field> findAllByClassId(Long id);
 }

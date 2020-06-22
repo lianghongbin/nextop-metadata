@@ -12,4 +12,7 @@ import com.nextop.metadata.entity.Classification;
 
 public interface ClassificationRepository extends Repository<Classification> {
 
+    int saveNotExist(Classification classification);
+
+    Classification findByName(String name);
 }

@@ -2,4 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nextop.metadata.mapper.OrderMapper">
 
+    <resultMap id="orderMap" type="com.nextop.metadata.entity.Order">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+
+        <collection property="fields" ofType="com.nextop.metadata.entity.Field" column="id" select="com.nextop.metadata.mapper.FieldMapper.selectAllByClassId">
+            <id property="id" column="id"/>
+            <result property="name" column="name"/>
+            <result property="comment" column="comment"/>
+        </collection>
+    </resultMap>
 </mapper>

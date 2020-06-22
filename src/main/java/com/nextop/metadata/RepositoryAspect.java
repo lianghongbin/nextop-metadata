@@ -75,18 +75,8 @@ public class RepositoryAspect {
         System.out.println("目标方法所属类的类名:" + joinPoint.getSignature().getDeclaringTypeName());
 
         System.out.println(joinPoint.getSignature().getDeclaringType().getInterfaces()[0].getGenericInterfaces()[0]);
-        Type type;
-        try {
-            type = joinPoint.getSignature().getDeclaringType().getInterfaces()[0].getGenericInterfaces()[0];
-            if (!(type instanceof ParameterizedType)) {
-                return;
-            }
-        } catch (Exception exception) {
-            return;
-        }
 
-        Class<?> clazz = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
-        if(!AnnotationParser.isMetadata(clazz)) {
+        if (!isMetadata(joinPoint)) {
             return;
         }
 
@@ -108,14 +98,21 @@ public class RepositoryAspect {
         Classifier classifier = object.getClass().getAnnotation(Classifier.class);
         name = "".equals(classifier.name()) ? name : classifier.name();
 
-        Classification classification = new Classification();
-        classification.setName(name);
-        classification.setComment(name);
-        classification.setCreateTime(Calendar.getInstance().getTimeInMillis());
-        Long id =idWorker.nextId();
-        classification.setId(id);
 
-        classificationRepository.save(classification);
+        Long id =idWorker.nextId();
+
+        Classification classification = classificationRepository.findByName(name);
+        if (classification == null) {
+            classification = new Classification();
+            classification.setName(name);
+            classification.setComment(name);
+            classification.setCreateTime(Calendar.getInstance().getTimeInMillis());
+            classification.setId(id);
+            classificationRepository.save(classification);
+        }
+        else {
+            id = classification.getId();
+        }
 
         List<Field> fieldList = new ArrayList<>();
 
@@ -136,11 +133,32 @@ public class RepositoryAspect {
             }
         }
 
+        Long finalId = id;
         fieldList.forEach(item -> {
-            item.setClassId(id);
+            item.setClassId(finalId);
         });
 
         fieldRepository.saveBatch(fieldList);
+    }
+
+    /**
+     * 判断是否是元数据操作
+     * @param joinPoint 拦截参数
+     * @return true/false
+     */
+    private boolean isMetadata(JoinPoint joinPoint) {
+        Type type;
+        try {
+            type = joinPoint.getSignature().getDeclaringType().getInterfaces()[0].getGenericInterfaces()[0];
+            if (!(type instanceof ParameterizedType)) {
+                return false;
+            }
+        } catch (Exception exception) {
+            return false;
+        }
+
+        Class<?> clazz = (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
+        return AnnotationParser.isMetadata(clazz);
     }
 
     @After(value = "read()")
